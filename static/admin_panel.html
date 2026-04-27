@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>TicketOracle &mdash; Admin Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #0e0f13;
+      --panel: #181a22;
+      --border: #2a2d39;
+      --fg: #e8e8ee;
+      --muted: #a0a3b1;
+      --accent: #f7b733;
+      --danger: #fc4a1a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg); color: var(--fg);
+    }
+    header {
+      padding: 18px 32px; border-bottom: 1px solid var(--border);
+      background: var(--panel); display: flex; justify-content: space-between;
+      align-items: center;
+    }
+    header h1 { margin: 0; font-size: 20px; color: var(--accent); }
+    .badge {
+      background: var(--danger); color: #1a1a1a; font-weight: 700;
+      padding: 4px 10px; border-radius: 6px; font-size: 12px;
+    }
+    main { max-width: 1000px; margin: 0 auto; padding: 32px; }
+    section { margin-bottom: 36px; }
+    h2 { margin: 0 0 12px; font-weight: 600; }
+    table { width: 100%; border-collapse: collapse; background: var(--panel); border-radius: 10px; overflow: hidden; }
+    th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
+    th { background: #20232c; color: var(--muted); text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; }
+    tr:last-child td { border-bottom: none; }
+    .yes { color: #ff6b6b; font-weight: 700; }
+    .no  { color: var(--muted); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Admin Panel</h1>
+    <span class="badge">RESTRICTED &middot; localhost only</span>
+  </header>
+  <main>
+    <section>
+      <h2>Users (sensitive)</h2>
+      <table id="users">
+        <thead>
+          <tr><th>Username</th><th>Phone number</th><th>Admin?</th></tr>
+        </thead>
+        <tbody><tr><td colspan="3">Loading&hellip;</td></tr></tbody>
+      </table>
+    </section>
+    <section>
+      <h2>Events</h2>
+      <table id="events">
+        <thead>
+          <tr><th>Artist</th><th>City</th><th>Venue</th><th>Date</th><th>Price (&euro;)</th></tr>
+        </thead>
+        <tbody><tr><td colspan="5">Loading&hellip;</td></tr></tbody>
+      </table>
+    </section>
+  </main>
+
+  <script>
+    async function loadUsers() {
+      const tbody = document.querySelector("#users tbody");
+      try {
+        const r = await fetch("/api/admin/users");
+        const data = await r.json();
+        tbody.innerHTML = data.map(u => `
+          <tr>
+            <td>${u.username}</td>
+            <td>${u.phone_number}</td>
+            <td class="${u.is_admin ? 'yes' : 'no'}">${u.is_admin ? 'YES' : 'no'}</td>
+          </tr>
+        `).join("");
+      } catch (e) {
+        tbody.innerHTML = '<tr><td colspan="3">Failed to load.</td></tr>';
+      }
+    }
+    async function loadEvents() {
+      const tbody = document.querySelector("#events tbody");
+      try {
+        const r = await fetch("/api/admin/events");
+        const data = await r.json();
+        tbody.innerHTML = data.map(ev => `
+          <tr>
+            <td>${ev.artist}</td>
+            <td>${ev.city}</td>
+            <td>${ev.venue}</td>
+            <td>${ev.date}</td>
+            <td>${ev.price_eur}</td>
+          </tr>
+        `).join("");
+      } catch (e) {
+        tbody.innerHTML = '<tr><td colspan="5">Failed to load.</td></tr>';
+      }
+    }
+    loadUsers();
+    loadEvents();
+  </script>
+</body>
+</html>
