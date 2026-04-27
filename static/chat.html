@@ -74,6 +74,16 @@
       color: #1a1a1a; font-weight: 700; cursor: pointer;
     }
     .composer button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .model-bar {
+      max-width: 760px; margin: 0 auto 0; padding: 10px 0 0;
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; color: var(--muted);
+    }
+    .model-bar select {
+      background: #20232c; color: var(--fg); border: 1px solid var(--border);
+      border-radius: 6px; padding: 4px 8px; font-size: 12px; cursor: pointer;
+    }
+    .model-bar select:focus { outline: none; border-color: var(--accent); }
   </style>
 </head>
 <body>
@@ -89,6 +99,18 @@
   </main>
 
   <footer>
+    <div class="model-bar">
+      <label for="model-select">Model:</label>
+      <select id="model-select">
+        <option value="meta-llama/llama-3.3-70b-instruct">Llama 3.3 70B</option>
+        <option value="qwen/qwen3-coder">Qwen3 Coder 480B</option>
+        <option value="deepseek/deepseek-r1">DeepSeek: R1</option>
+        <option value="openai/gpt-oss-120b">GPT-oss</option>
+        <option value="openai/gpt-5.2">GPT-5.2</option>
+        <option value="google/gemini-3.1-pro-preview">Gemini 3.1 Pro Preview</option>
+        <option value="anthropic/claude-opus-4.6">Claude Opus 4.6</option>
+      </select>
+    </div>
     <form class="composer" id="composer">
       <input id="input" type="text" autocomplete="off"
              placeholder="What is the price for Metallica?" />
@@ -97,10 +119,11 @@
   </footer>
 
   <script>
-    const thread = document.getElementById("thread");
-    const form   = document.getElementById("composer");
-    const input  = document.getElementById("input");
-    const send   = document.getElementById("send");
+    const thread       = document.getElementById("thread");
+    const form         = document.getElementById("composer");
+    const input        = document.getElementById("input");
+    const send         = document.getElementById("send");
+    const modelSelect  = document.getElementById("model-select");
 
     let history = [];
 
@@ -137,9 +160,10 @@
         const r = await fetch("/api/chat", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ message: text, history }),
+          body: JSON.stringify({ message: text, history, model: modelSelect.value }),
         });
         const data = await r.json();
+        if (data.error) { addMessage("bot", "Error: " + data.error); return; }
         addTrace(data.trace);
         addMessage("bot", data.reply || "(no reply)");
         history = data.history || history;
