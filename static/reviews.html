@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>TicketOracle &mdash; Reviews</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #0e0f13;
+      --panel: #181a22;
+      --border: #2a2d39;
+      --fg: #e8e8ee;
+      --muted: #a0a3b1;
+      --accent: #f7b733;
+      --accent2: #fc4a1a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg); color: var(--fg);
+    }
+
+    /* Header */
+    header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 18px 32px; border-bottom: 1px solid var(--border);
+      background: var(--panel);
+    }
+    header h1 {
+      margin: 0; font-size: 20px; letter-spacing: 0.5px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    nav { display: flex; gap: 10px; }
+    nav a {
+      color: var(--fg); text-decoration: none; padding: 8px 14px;
+      border: 1px solid var(--border); border-radius: 8px;
+      background: #20232c; font-size: 14px;
+    }
+    nav a:hover { border-color: var(--accent); }
+
+    main { max-width: 860px; margin: 0 auto; padding: 32px; }
+
+    /* Back link */
+    #back-btn {
+      display: none; align-items: center; gap: 6px;
+      background: none; border: none; color: var(--muted);
+      font-size: 14px; cursor: pointer; padding: 0; margin-bottom: 24px;
+    }
+    #back-btn:hover { color: var(--fg); }
+    #back-btn svg { flex-shrink: 0; }
+
+    /* Events list */
+    h2 { margin: 0 0 16px; font-weight: 600; }
+    .grid {
+      display: grid; gap: 14px;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    }
+    .card {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 12px; padding: 18px; cursor: pointer;
+      transition: border-color 0.15s, transform 0.1s;
+    }
+    .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .card .artist { font-size: 17px; font-weight: 600; margin-bottom: 5px; }
+    .card .meta { color: var(--muted); font-size: 13px; line-height: 1.6; }
+    .card .price { margin-top: 10px; font-size: 18px; font-weight: 700; color: var(--accent); }
+
+    /* Reviews view */
+    #reviews-view { display: none; }
+    .event-header {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px 24px; margin-bottom: 28px;
+    }
+    .event-header .artist { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+    .event-header .meta { color: var(--muted); font-size: 14px; line-height: 1.7; }
+    .event-header .price { font-size: 20px; font-weight: 700; color: var(--accent); margin-top: 10px; }
+
+    /* Submit form */
+    .submit-form {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px 24px; margin-bottom: 28px;
+    }
+    .submit-form h3 { margin: 0 0 12px; font-size: 15px; font-weight: 600; }
+    textarea {
+      width: 100%; background: #20232c; border: 1px solid var(--border);
+      color: var(--fg); border-radius: 8px; padding: 10px 12px;
+      font-size: 14px; font-family: inherit; resize: vertical; min-height: 90px;
+      outline: none;
+    }
+    textarea:focus { border-color: var(--accent); }
+    .form-footer { display: flex; justify-content: flex-end; margin-top: 10px; }
+    .btn-primary {
+      background: var(--accent); color: #1a1a1a; border: none;
+      border-radius: 8px; padding: 9px 20px; font-size: 14px;
+      font-weight: 700; cursor: pointer;
+    }
+    .btn-primary:hover { opacity: 0.85; }
+    .btn-primary:disabled { opacity: 0.45; cursor: default; }
+
+    /* Review list */
+    #reviews-list h3 { margin: 0 0 12px; font-size: 15px; font-weight: 600; }
+    .review-item {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px 18px; margin-bottom: 10px;
+      font-size: 14px; line-height: 1.6;
+    }
+    .empty { color: var(--muted); font-size: 14px; padding: 8px 0; }
+
+    /* Toast */
+    #toast {
+      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+      background: #23263a; color: var(--fg); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 22px; font-size: 14px;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s; white-space: nowrap;
+    }
+    #toast.show { opacity: 1; }
+    #toast.ok  { border-color: #2ecc71; color: #2ecc71; }
+    #toast.err { border-color: var(--accent2); color: var(--accent2); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>TicketOracle</h1>
+    <nav>
+      <a href="/">Events</a>
+      <a href="/chat">AI assistant</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Events list -->
+    <div id="events-view">
+      <h2>Reviews &mdash; choose an event</h2>
+      <div id="events-grid" class="grid">
+        <div class="empty">Loading&hellip;</div>
+      </div>
+    </div>
+
+    <!-- Reviews for a specific event -->
+    <div id="reviews-view">
+      <button id="back-btn" onclick="showEventsList()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        All events
+      </button>
+
+      <div id="event-header" class="event-header"></div>
+
+      <div class="submit-form">
+        <h3>Leave a review</h3>
+        <textarea id="review-text" placeholder="Share your experience…" maxlength="1000"></textarea>
+        <div class="form-footer">
+          <button class="btn-primary" id="submit-btn" onclick="submitReview()">Post review</button>
+        </div>
+      </div>
+
+      <div id="reviews-list">
+        <h3>What others say</h3>
+        <div id="reviews-items"><div class="empty">Loading&hellip;</div></div>
+      </div>
+    </div>
+  </main>
+
+  <div id="toast"></div>
+
+  <script>
+    let currentEventId = null;
+
+    // ── Toast ──────────────────────────────────────────────────────
+    let toastTimer;
+    function toast(msg, type = "ok") {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.className = `show ${type}`;
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => { el.className = ""; }, 2800);
+    }
+
+    // ── XSS-safe escaping ──────────────────────────────────────────
+    function esc(s) {
+      return String(s)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    // ── Events list ────────────────────────────────────────────────
+    async function loadEventsList() {
+      const grid = document.getElementById("events-grid");
+      try {
+        const r = await fetch("/api/events");
+        const data = await r.json();
+        if (!data.length) {
+          grid.innerHTML = '<div class="empty">No events available.</div>';
+          return;
+        }
+        grid.innerHTML = data.map(ev => `
+          <div class="card" onclick="showReviews('${esc(ev.id)}')">
+            <div class="artist">${esc(ev.artist)}</div>
+            <div class="meta">
+              ${esc(ev.city)} &middot; ${esc(ev.venue)}<br/>
+              ${esc(ev.date)}
+            </div>
+            <div class="price">&euro;${ev.price_eur}</div>
+          </div>
+        `).join("");
+      } catch {
+        grid.innerHTML = '<div class="empty">Failed to load events.</div>';
+      }
+    }
+
+    // ── Show reviews for one event ─────────────────────────────────
+    async function showReviews(eventId) {
+      currentEventId = eventId;
+      document.getElementById("events-view").style.display = "none";
+      const rv = document.getElementById("reviews-view");
+      rv.style.display = "block";
+      document.getElementById("back-btn").style.display = "flex";
+      document.getElementById("review-text").value = "";
+
+      // Render event header
+      try {
+        const r = await fetch(`/api/event/${encodeURIComponent(eventId)}`);
+        const ev = await r.json();
+        document.getElementById("event-header").innerHTML = `
+          <div class="artist">${esc(ev.artist)}</div>
+          <div class="meta">
+            ${esc(ev.city)} &middot; ${esc(ev.venue)}<br/>
+            ${esc(ev.date)}
+          </div>
+          <div class="price">&euro;${ev.price_eur}</div>
+        `;
+        document.title = `Reviews — ${ev.artist} | TicketOracle`;
+      } catch {
+        document.getElementById("event-header").innerHTML =
+          '<div class="empty">Could not load event details.</div>';
+      }
+
+      location.hash = eventId;
+      await loadReviews(eventId);
+    }
+
+    async function loadReviews(eventId) {
+      const container = document.getElementById("reviews-items");
+      container.innerHTML = '<div class="empty">Loading&hellip;</div>';
+      try {
+        const r = await fetch(`/api/event/${encodeURIComponent(eventId)}/reviews`);
+        const data = await r.json();
+        const reviews = data.reviews || [];
+        if (!reviews.length) {
+          container.innerHTML = '<div class="empty">No reviews yet. Be the first!</div>';
+          return;
+        }
+        container.innerHTML = reviews.map(text => `
+          <div class="review-item">${esc(text)}</div>
+        `).join("");
+      } catch {
+        container.innerHTML = '<div class="empty">Failed to load reviews.</div>';
+      }
+    }
+
+    // ── Submit review ──────────────────────────────────────────────
+    async function submitReview() {
+      const textarea = document.getElementById("review-text");
+      const btn = document.getElementById("submit-btn");
+      const text = textarea.value.trim();
+      if (!text) { toast("Please write something first.", "err"); return; }
+
+      btn.disabled = true;
+      try {
+        const r = await fetch(`/api/event/${encodeURIComponent(currentEventId)}/reviews`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text }),
+        });
+        const data = await r.json();
+        if (!r.ok) { toast(data.error || "Error posting review.", "err"); return; }
+        textarea.value = "";
+        toast("Review posted!");
+        await loadReviews(currentEventId);
+      } catch {
+        toast("Failed to post review.", "err");
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    // ── Back to list ───────────────────────────────────────────────
+    function showEventsList() {
+      currentEventId = null;
+      document.getElementById("reviews-view").style.display = "none";
+      document.getElementById("back-btn").style.display = "none";
+      document.getElementById("events-view").style.display = "block";
+      document.title = "Reviews | TicketOracle";
+      location.hash = "";
+    }
+
+    // ── Handle direct URL with hash (e.g. /reviews#metallica) ─────
+    async function init() {
+      await loadEventsList();
+      const hash = location.hash.replace("#", "").trim();
+      if (hash) showReviews(hash);
+    }
+
+    init();
+  </script>
+</body>
+</html>

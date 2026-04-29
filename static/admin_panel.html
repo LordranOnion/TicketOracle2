@@ -13,10 +13,12 @@
       --muted: #a0a3b1;
       --accent: #f7b733;
       --danger: #fc4a1a;
+      --success: #2ecc71;
     }
     * { box-sizing: border-box; }
     body {
-      margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: var(--bg); color: var(--fg);
     }
     header {
@@ -29,15 +31,59 @@
       background: var(--danger); color: #1a1a1a; font-weight: 700;
       padding: 4px 10px; border-radius: 6px; font-size: 12px;
     }
-    main { max-width: 1000px; margin: 0 auto; padding: 32px; }
-    section { margin-bottom: 36px; }
-    h2 { margin: 0 0 12px; font-weight: 600; }
+    main { max-width: 1100px; margin: 0 auto; padding: 32px; }
+    section { margin-bottom: 48px; }
+    h2 { margin: 0 0 16px; font-weight: 600; font-size: 17px; }
+
+    /* Tables */
     table { width: 100%; border-collapse: collapse; background: var(--panel); border-radius: 10px; overflow: hidden; }
     th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
     th { background: #20232c; color: var(--muted); text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; }
     tr:last-child td { border-bottom: none; }
     .yes { color: #ff6b6b; font-weight: 700; }
     .no  { color: var(--muted); }
+
+    /* Buttons */
+    button {
+      cursor: pointer; border: none; border-radius: 6px;
+      font-size: 13px; font-weight: 600; padding: 6px 14px;
+      transition: opacity 0.15s;
+    }
+    button:hover { opacity: 0.82; }
+    .btn-danger  { background: var(--danger); color: #fff; }
+    .btn-primary { background: var(--accent); color: #1a1a1a; }
+
+    /* Add forms */
+    .add-form {
+      display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end;
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 10px; padding: 16px; margin-top: 16px;
+    }
+    .field { display: flex; flex-direction: column; gap: 4px; }
+    .field label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; }
+    .field input[type="text"],
+    .field input[type="number"],
+    .field input[type="date"] {
+      background: #20232c; border: 1px solid var(--border); color: var(--fg);
+      border-radius: 6px; padding: 7px 10px; font-size: 14px; width: 160px;
+      outline: none;
+    }
+    .field input:focus { border-color: var(--accent); }
+    .field.checkbox-field { flex-direction: row; align-items: center; gap: 8px; padding-bottom: 6px; }
+    .field.checkbox-field label { text-transform: uppercase; font-size: 12px; color: var(--muted); margin: 0; }
+    .field input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--accent); }
+
+    /* Toast */
+    #toast {
+      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+      background: #23263a; color: var(--fg); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 22px; font-size: 14px;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+      white-space: nowrap;
+    }
+    #toast.show { opacity: 1; }
+    #toast.ok   { border-color: var(--success); color: var(--success); }
+    #toast.err  { border-color: var(--danger);  color: var(--danger);  }
   </style>
 </head>
 <body>
@@ -45,62 +91,218 @@
     <h1>Admin Panel</h1>
     <span class="badge">RESTRICTED &middot; localhost only</span>
   </header>
+
   <main>
+    <!-- ── Users ────────────────────────────────────────────────── -->
     <section>
-      <h2>Users (sensitive)</h2>
-      <table id="users">
+      <h2>Users</h2>
+      <table id="users-table">
         <thead>
-          <tr><th>Username</th><th>Phone number</th><th>Admin?</th></tr>
+          <tr>
+            <th>Username</th>
+            <th>Phone number</th>
+            <th>Admin?</th>
+            <th></th>
+          </tr>
         </thead>
-        <tbody><tr><td colspan="3">Loading&hellip;</td></tr></tbody>
+        <tbody><tr><td colspan="4">Loading&hellip;</td></tr></tbody>
       </table>
+
+      <form class="add-form" id="add-user-form">
+        <div class="field">
+          <label>Username</label>
+          <input type="text" name="username" placeholder="jdoe" required />
+        </div>
+        <div class="field">
+          <label>Phone number</label>
+          <input type="text" name="phone_number" placeholder="+1 555 000 0000" required />
+        </div>
+        <div class="field checkbox-field">
+          <input type="checkbox" name="is_admin" id="is_admin" />
+          <label for="is_admin">Admin</label>
+        </div>
+        <button type="submit" class="btn-primary">Add user</button>
+      </form>
     </section>
+
+    <!-- ── Events ───────────────────────────────────────────────── -->
     <section>
       <h2>Events</h2>
-      <table id="events">
+      <table id="events-table">
         <thead>
-          <tr><th>Artist</th><th>City</th><th>Venue</th><th>Date</th><th>Price (&euro;)</th></tr>
+          <tr>
+            <th>Artist</th>
+            <th>City</th>
+            <th>Venue</th>
+            <th>Date</th>
+            <th>Price (&euro;)</th>
+            <th></th>
+          </tr>
         </thead>
-        <tbody><tr><td colspan="5">Loading&hellip;</td></tr></tbody>
+        <tbody><tr><td colspan="6">Loading&hellip;</td></tr></tbody>
       </table>
+
+      <form class="add-form" id="add-event-form">
+        <div class="field">
+          <label>Slug / ID</label>
+          <input type="text" name="id" placeholder="new-artist" required />
+        </div>
+        <div class="field">
+          <label>Artist</label>
+          <input type="text" name="artist" placeholder="Artist Name" required />
+        </div>
+        <div class="field">
+          <label>City</label>
+          <input type="text" name="city" placeholder="London" required />
+        </div>
+        <div class="field">
+          <label>Venue</label>
+          <input type="text" name="venue" placeholder="Wembley Stadium" required />
+        </div>
+        <div class="field">
+          <label>Date</label>
+          <input type="date" name="date" required />
+        </div>
+        <div class="field">
+          <label>Price (&euro;)</label>
+          <input type="number" name="price_eur" placeholder="120" min="1" required />
+        </div>
+        <button type="submit" class="btn-primary">Add event</button>
+      </form>
     </section>
   </main>
 
+  <div id="toast"></div>
+
   <script>
+    // ── Toast ──────────────────────────────────────────────────────
+    let toastTimer;
+    function toast(msg, type = "ok") {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.className = `show ${type}`;
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => { el.className = ""; }, 2800);
+    }
+
+    // ── Render users ───────────────────────────────────────────────
+    function renderUsers(data) {
+      document.querySelector("#users-table tbody").innerHTML = data.map(u => `
+        <tr>
+          <td>${esc(u.username)}</td>
+          <td>${esc(u.phone_number)}</td>
+          <td class="${u.is_admin ? 'yes' : 'no'}">${u.is_admin ? 'YES' : 'no'}</td>
+          <td>
+            <button class="btn-danger" onclick="deleteUser('${esc(u.username)}')">Remove</button>
+          </td>
+        </tr>
+      `).join("");
+    }
+
     async function loadUsers() {
-      const tbody = document.querySelector("#users tbody");
       try {
         const r = await fetch("/api/admin/users");
-        const data = await r.json();
-        tbody.innerHTML = data.map(u => `
-          <tr>
-            <td>${u.username}</td>
-            <td>${u.phone_number}</td>
-            <td class="${u.is_admin ? 'yes' : 'no'}">${u.is_admin ? 'YES' : 'no'}</td>
-          </tr>
-        `).join("");
-      } catch (e) {
-        tbody.innerHTML = '<tr><td colspan="3">Failed to load.</td></tr>';
+        renderUsers(await r.json());
+      } catch {
+        document.querySelector("#users-table tbody").innerHTML =
+          '<tr><td colspan="4">Failed to load.</td></tr>';
       }
     }
+
+    async function deleteUser(username) {
+      if (!confirm(`Remove user "${username}"?`)) return;
+      const r = await fetch(`/api/admin/delete-user/${encodeURIComponent(username)}`);
+      const data = await r.json();
+      if (!r.ok) { toast(data.error || "Error", "err"); return; }
+      toast(`User "${username}" removed.`);
+      loadUsers();
+    }
+
+    document.getElementById("add-user-form").addEventListener("submit", async e => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const body = {
+        username:     fd.get("username"),
+        phone_number: fd.get("phone_number"),
+        is_admin:     fd.get("is_admin") === "on",
+      };
+      const r = await fetch("/api/admin/add-user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await r.json();
+      if (!r.ok) { toast(data.error || "Error", "err"); return; }
+      toast(`User "${data.username}" added.`);
+      e.target.reset();
+      loadUsers();
+    });
+
+    // ── Render events ──────────────────────────────────────────────
+    function renderEvents(data) {
+      document.querySelector("#events-table tbody").innerHTML = data.map(ev => `
+        <tr>
+          <td>${esc(ev.artist)}</td>
+          <td>${esc(ev.city)}</td>
+          <td>${esc(ev.venue)}</td>
+          <td>${esc(ev.date)}</td>
+          <td>${ev.price_eur}</td>
+          <td>
+            <button class="btn-danger" onclick="deleteEvent('${esc(ev.id)}')">Remove</button>
+          </td>
+        </tr>
+      `).join("");
+    }
+
     async function loadEvents() {
-      const tbody = document.querySelector("#events tbody");
       try {
         const r = await fetch("/api/admin/events");
-        const data = await r.json();
-        tbody.innerHTML = data.map(ev => `
-          <tr>
-            <td>${ev.artist}</td>
-            <td>${ev.city}</td>
-            <td>${ev.venue}</td>
-            <td>${ev.date}</td>
-            <td>${ev.price_eur}</td>
-          </tr>
-        `).join("");
-      } catch (e) {
-        tbody.innerHTML = '<tr><td colspan="5">Failed to load.</td></tr>';
+        renderEvents(await r.json());
+      } catch {
+        document.querySelector("#events-table tbody").innerHTML =
+          '<tr><td colspan="6">Failed to load.</td></tr>';
       }
     }
+
+    async function deleteEvent(eventId) {
+      if (!confirm(`Remove event "${eventId}"?`)) return;
+      const r = await fetch(`/api/admin/delete-event/${encodeURIComponent(eventId)}`);
+      const data = await r.json();
+      if (!r.ok) { toast(data.error || "Error", "err"); return; }
+      toast(`Event "${eventId}" removed.`);
+      loadEvents();
+    }
+
+    document.getElementById("add-event-form").addEventListener("submit", async e => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const body = {
+        id:        fd.get("id"),
+        artist:    fd.get("artist"),
+        city:      fd.get("city"),
+        venue:     fd.get("venue"),
+        date:      fd.get("date"),
+        price_eur: parseInt(fd.get("price_eur"), 10),
+      };
+      const r = await fetch("/api/admin/add-event", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await r.json();
+      if (!r.ok) { toast(data.error || "Error", "err"); return; }
+      toast(`Event "${data.artist}" added.`);
+      e.target.reset();
+      loadEvents();
+    });
+
+    // ── XSS-safe text escaping ─────────────────────────────────────
+    function esc(s) {
+      return String(s)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
     loadUsers();
     loadEvents();
   </script>

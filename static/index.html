@@ -37,6 +37,13 @@
     header a:hover { border-color: var(--accent); }
     main { max-width: 1000px; margin: 0 auto; padding: 32px; }
     h2 { margin: 0 0 16px; font-weight: 600; }
+    .search-bar {
+      width: 100%; background: var(--panel); border: 1px solid var(--border);
+      color: var(--fg); border-radius: 10px; padding: 11px 16px;
+      font-size: 15px; font-family: inherit; outline: none; margin-bottom: 20px;
+    }
+    .search-bar:focus { border-color: var(--accent); }
+    .search-bar::placeholder { color: var(--muted); }
     .grid {
       display: grid; gap: 16px;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -56,37 +63,52 @@
 <body>
   <header>
     <h1>TicketOracle</h1>
+    <a href="/reviews">Reviews</a>
     <a href="/chat">Ask the AI assistant &rarr;</a>
   </header>
   <main>
     <h2>Upcoming events</h2>
+    <input class="search-bar" id="search" type="search" placeholder="Search by artist, city, or venue&hellip;" />
     <div id="events" class="grid"><div class="empty">Loading&hellip;</div></div>
   </main>
 
   <script>
-    async function loadEvents() {
+    function renderEvents(data) {
+      const root = document.getElementById("events");
+      if (!Array.isArray(data) || data.length === 0) {
+        root.innerHTML = '<div class="empty">No events found.</div>';
+        return;
+      }
+      root.innerHTML = data.map(ev => `
+        <div class="card">
+          <div class="artist">${ev.artist}</div>
+          <div class="meta">
+            ${ev.city} &middot; ${ev.venue}<br/>
+            ${ev.date}
+          </div>
+          <div class="price">&euro;${ev.price_eur}</div>
+        </div>
+      `).join("");
+    }
+
+    async function loadEvents(query = "") {
       const root = document.getElementById("events");
       try {
-        const r = await fetch("/api/events");
+        const url = query ? `/api/search?q=${encodeURIComponent(query)}` : "/api/events";
+        const r = await fetch(url);
         const data = await r.json();
-        if (!Array.isArray(data) || data.length === 0) {
-          root.innerHTML = '<div class="empty">No events available.</div>';
-          return;
-        }
-        root.innerHTML = data.map(ev => `
-          <div class="card">
-            <div class="artist">${ev.artist}</div>
-            <div class="meta">
-              ${ev.city} &middot; ${ev.venue}<br/>
-              ${ev.date}
-            </div>
-            <div class="price">&euro;${ev.price_eur}</div>
-          </div>
-        `).join("");
-      } catch (e) {
+        renderEvents(query ? data.results : data);
+      } catch {
         root.innerHTML = '<div class="empty">Failed to load events.</div>';
       }
     }
+
+    let debounceTimer;
+    document.getElementById("search").addEventListener("input", e => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => loadEvents(e.target.value.trim()), 250);
+    });
+
     loadEvents();
   </script>
 </body>
