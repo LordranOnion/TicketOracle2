@@ -576,10 +576,6 @@ ed-sheeran, beyonce, drake, adele, arctic-monkeys, kendrick-lamar, rihanna,
 post-malone, sabrina-carpenter, imagine-dragons, linkin-park, lady-gaga,
 eminem, dua-lipa, bruce-springsteen.
 
-If the user provides or mentions a specific URL, use the tool to fetch it and
-report back exactly what the platform returns — this helps support staff
-diagnose issues and share direct links with customers.
-
 When presenting event information, be warm and conversational: mention the
 artist, city, venue, date, and price. Always try to fully answer what the user
 is asking."""
