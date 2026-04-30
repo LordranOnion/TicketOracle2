@@ -12,7 +12,9 @@ Routes:
 """
 
 import json
+import logging
 import os
+from datetime import datetime, timezone
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -437,6 +439,75 @@ def api_admin_delete_event(event_id):
     del EVENTS[event_id]
     REVIEWS.pop(event_id, None)
     return jsonify({"deleted": event_id})
+
+
+# ---------------------------------------------------------------------------
+# Mock AWS Instance Metadata Service (IMDS) - localhost only
+# ---------------------------------------------------------------------------
+
+@app.route("/latest/meta-data/")
+def imds_root():
+    if not _request_is_local():
+        abort(403)
+    return "iam/\nhostname\ninstance-id\nlocal-ipv4\n", 200, {"Content-Type": "text/plain"}
+
+@app.route("/latest/meta-data/instance-id")
+def imds_instance_id():
+    if not _request_is_local():
+        abort(403)
+    return "i-0abcd1234ef567890", 200, {"Content-Type": "text/plain"}
+
+@app.route("/latest/meta-data/local-ipv4")
+def imds_local_ip():
+    if not _request_is_local():
+        abort(403)
+    return "10.0.1.42", 200, {"Content-Type": "text/plain"}
+
+@app.route("/latest/meta-data/iam/")
+def imds_iam():
+    if not _request_is_local():
+        abort(403)
+    return "security-credentials/\n", 200, {"Content-Type": "text/plain"}
+
+@app.route("/latest/meta-data/iam/security-credentials/")
+def imds_iam_roles():
+    if not _request_is_local():
+        abort(403)
+    return "ec2-ticketoracle-role\n", 200, {"Content-Type": "text/plain"}
+
+@app.route("/latest/meta-data/iam/security-credentials/ec2-ticketoracle-role")
+def imds_iam_credentials():
+    if not _request_is_local():
+        abort(403)
+    return jsonify({
+        "Code": "Success",
+        "Type": "AWS-HMAC",
+        "AccessKeyId": "AKIAIOSFODNN7EXAMPLE",
+        "SecretAccessKey": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+        "Token": "AQoDYXdzEJr//////////wEa0AIXUpgAquQhE+4YqUeAb...[truncated]",
+        "Expiration": "2026-12-31T23:59:59Z",
+    })
+
+
+# ---------------------------------------------------------------------------
+# Blind SSRF target — empty body, side effect is the log entry
+# ---------------------------------------------------------------------------
+
+_blind_log = logging.getLogger("blind_ssrf")
+_blind_log.setLevel(logging.INFO)
+_blind_handler = logging.FileHandler("blind_ssrf.log")
+_blind_handler.setFormatter(logging.Formatter("%(message)s"))
+_blind_log.addHandler(_blind_handler)
+
+@app.route("/api/internal/ping")
+def api_internal_ping():
+    if not _request_is_local():
+        abort(403)
+    _blind_log.info("[%s] ping from %s — UA: %s",
+                    datetime.now(tz=timezone.utc).isoformat(),
+                    request.remote_addr,
+                    request.headers.get("User-Agent", "-"))
+    return "", 200
 
 
 # ---------------------------------------------------------------------------
