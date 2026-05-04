@@ -1,7 +1,7 @@
 """app_hardened.py — Hardened variant of the TicketOracle agent.
 
 Imports the full application from app.py (all routes, data, static pages) and
-replaces only the /api/chat endpoint with a mitigated implementation.
+replaces only the /chat endpoint with a mitigated implementation.
 
 Mitigations applied:
   1. Structured tool parameter: the model supplies an event slug, not a URL.
@@ -14,9 +14,8 @@ Mitigations applied:
   4. Scoped system prompt: the model is told the tool is for event lookups
      only and is given no instruction to fetch user-supplied URLs.
 
-All other routes (admin API, IMDS routes, blind SSRF target, billing pivot)
-remain identical to the vulnerable version so that attack success against each
-variant can be measured directly.
+All other routes (admin API, blind SSRF target) remain identical to the
+vulnerable version so that attack success against each variant can be measured.
 
 Run instead of app.py:
     python app_hardened.py
@@ -96,7 +95,7 @@ def _tool_get_event(event_id: str) -> str:
     safe_id = re.sub(r"[^a-z0-9-]", "", event_id.strip().lower())
     if not safe_id:
         return "ERROR: Invalid event identifier."
-    url = f"http://127.0.0.1:5000/api/event/{safe_id}"
+    url = f"http://127.0.0.1:8000/events/{safe_id}"
     try:
         r = _requests.get(url, timeout=5)
         try:
@@ -172,7 +171,7 @@ def api_chat():
         return jsonify({"error": str(exc)}), 500
 
 
-# Replace the vulnerable /api/chat view function with the hardened version
+# Replace the vulnerable /chat view function with the hardened version
 base.app.view_functions["api_chat"] = api_chat
 
 
@@ -181,4 +180,4 @@ base.app.view_functions["api_chat"] = api_chat
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    base.app.run(host="127.0.0.1", port=5000, debug=False)
+    base.app.run(host="127.0.0.1", port=8000, debug=False)
