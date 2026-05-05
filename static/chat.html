@@ -157,7 +157,7 @@
       input.value = "";
       send.disabled = true;
       try {
-        const r = await fetch("/api/chat", {
+        const r = await fetch("/chat", {
           method: "POST",
           headers: { "content-type": "application/json" },
           body: JSON.stringify({ message: text, history, model: modelSelect.value }),

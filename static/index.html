@@ -94,7 +94,7 @@
     async function loadEvents(query = "") {
       const root = document.getElementById("events");
       try {
-        const url = query ? `/api/search?q=${encodeURIComponent(query)}` : "/api/events";
+        const url = "/events";
         const r = await fetch(url);
         const data = await r.json();
         renderEvents(query ? data.results : data);

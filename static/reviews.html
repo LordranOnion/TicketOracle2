@@ -190,7 +190,7 @@
     async function loadEventsList() {
       const grid = document.getElementById("events-grid");
       try {
-        const r = await fetch("/api/events");
+        const r = await fetch("/events");
         const data = await r.json();
         if (!data.length) {
           grid.innerHTML = '<div class="empty">No events available.</div>';
@@ -222,7 +222,7 @@
 
       // Render event header
       try {
-        const r = await fetch(`/api/event/${encodeURIComponent(eventId)}`);
+        const r = await fetch(`/events/${encodeURIComponent(eventId)}`);
         const ev = await r.json();
         document.getElementById("event-header").innerHTML = `
           <div class="artist">${esc(ev.artist)}</div>
@@ -246,7 +246,7 @@
       const container = document.getElementById("reviews-items");
       container.innerHTML = '<div class="empty">Loading&hellip;</div>';
       try {
-        const r = await fetch(`/api/event/${encodeURIComponent(eventId)}/reviews`);
+        const r = await fetch(`/events/${encodeURIComponent(eventId)}/reviews`);
         const data = await r.json();
         const reviews = data.reviews || [];
         if (!reviews.length) {
@@ -270,7 +270,7 @@
 
       btn.disabled = true;
       try {
-        const r = await fetch(`/api/event/${encodeURIComponent(currentEventId)}/reviews`, {
+        const r = await fetch(`/events/${encodeURIComponent(currentEventId)}/reviews`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ text }),
