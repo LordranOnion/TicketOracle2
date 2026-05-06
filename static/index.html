@@ -91,13 +91,14 @@
       `).join("");
     }
 
-    async function loadEvents(query = "") {
+    let allEvents = [];
+
+    async function loadEvents() {
       const root = document.getElementById("events");
       try {
-        const url = "/events";
-        const r = await fetch(url);
-        const data = await r.json();
-        renderEvents(query ? data.results : data);
+        const r = await fetch("/events");
+        allEvents = await r.json();
+        renderEvents(allEvents);
       } catch {
         root.innerHTML = '<div class="empty">Failed to load events.</div>';
       }
@@ -106,7 +107,16 @@
     let debounceTimer;
     document.getElementById("search").addEventListener("input", e => {
       clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(() => loadEvents(e.target.value.trim()), 250);
+      const q = e.target.value.trim().toLowerCase();
+      debounceTimer = setTimeout(() => {
+        const filtered = q
+          ? allEvents.filter(ev =>
+              ev.artist.toLowerCase().includes(q) ||
+              ev.city.toLowerCase().includes(q) ||
+              ev.venue.toLowerCase().includes(q))
+          : allEvents;
+        renderEvents(filtered);
+      }, 250);
     });
 
     loadEvents();

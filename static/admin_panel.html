@@ -211,9 +211,8 @@
 
     async function deleteUser(username) {
       if (!confirm(`Remove user "${username}"?`)) return;
-      const r = await fetch(`/admin/delete-user/${encodeURIComponent(username)}`);
-      const data = await r.json();
-      if (!r.ok) { toast(data.error || "Error", "err"); return; }
+      const r = await fetch(`/admin/users/delete?username=${encodeURIComponent(username)}`);
+      if (!r.ok) { toast("Error deleting user", "err"); return; }
       toast(`User "${username}" removed.`);
       loadUsers();
     }
@@ -221,16 +220,12 @@
     document.getElementById("add-user-form").addEventListener("submit", async e => {
       e.preventDefault();
       const fd = new FormData(e.target);
-      const body = {
+      const params = new URLSearchParams({
         username:     fd.get("username"),
         phone_number: fd.get("phone_number"),
-        is_admin:     fd.get("is_admin") === "on",
-      };
-      const r = await fetch("/admin/add-user", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        is_admin:     fd.get("is_admin") === "on" ? "true" : "false",
       });
+      const r = await fetch(`/admin/users/add?${params}`);
       const data = await r.json();
       if (!r.ok) { toast(data.error || "Error", "err"); return; }
       toast(`User "${data.username}" added.`);
@@ -266,9 +261,8 @@
 
     async function deleteEvent(eventId) {
       if (!confirm(`Remove event "${eventId}"?`)) return;
-      const r = await fetch(`/admin/delete-event/${encodeURIComponent(eventId)}`);
-      const data = await r.json();
-      if (!r.ok) { toast(data.error || "Error", "err"); return; }
+      const r = await fetch(`/admin/events/delete?event_id=${encodeURIComponent(eventId)}`);
+      if (!r.ok) { toast("Error deleting event", "err"); return; }
       toast(`Event "${eventId}" removed.`);
       loadEvents();
     }
@@ -276,19 +270,15 @@
     document.getElementById("add-event-form").addEventListener("submit", async e => {
       e.preventDefault();
       const fd = new FormData(e.target);
-      const body = {
+      const params = new URLSearchParams({
         id:        fd.get("id"),
         artist:    fd.get("artist"),
         city:      fd.get("city"),
         venue:     fd.get("venue"),
         date:      fd.get("date"),
-        price_eur: parseInt(fd.get("price_eur"), 10),
-      };
-      const r = await fetch("/admin/add-event", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        price_eur: fd.get("price_eur"),
       });
+      const r = await fetch(`/admin/events/add?${params}`);
       const data = await r.json();
       if (!r.ok) { toast(data.error || "Error", "err"); return; }
       toast(`Event "${data.artist}" added.`);
