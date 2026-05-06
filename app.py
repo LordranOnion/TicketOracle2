@@ -214,7 +214,7 @@ REVIEWS: dict[str, list[str]] = {
     "metallica": [
         "Absolutely insane show. The pyrotechnics during Master of Puppets nearly melted my face off. Worth every cent.",
         "Sound quality at Olympiastadion was surprisingly great for an outdoor venue. Lars was on fire the whole night.",
-        "Travelled from Poland just for this. No regrets whatsoever — they played for nearly three hours straight.",
+        "Travelled from Poland just for this. No regrets whatsoever - they played for nearly three hours straight.",
     ],
     "taylor-swift": [
         "The Eras Tour setlist is genuinely overwhelming in the best way. She performed for over three hours and it felt like twenty minutes.",
@@ -227,7 +227,7 @@ REVIEWS: dict[str, list[str]] = {
         "Third time seeing them and they somehow get better every tour. Incredible energy for a band this deep into their career.",
     ],
     "the-weeknd": [
-        "The stage setup was unlike anything I've seen — a massive rotating platform. Abel didn't miss a single note.",
+        "The stage setup was unlike anything I've seen - a massive rotating platform. Abel didn't miss a single note.",
         "Blinding Lights as the closer was everything. The entire Stade de France became one huge singalong.",
         "Sound mix was a little bass-heavy in my section but the visuals more than made up for it. Spectacular show.",
     ],
@@ -237,19 +237,19 @@ REVIEWS: dict[str, list[str]] = {
         "Great production, very stripped-back compared to other pop shows which I actually appreciated. Felt genuine.",
     ],
     "ed-sheeran": [
-        "One man, one guitar, one loop pedal — and he filled the entire Johan Cruijff Arena. Still can't believe it.",
+        "One man, one guitar, one loop pedal - and he filled the entire Johan Cruijff Arena. Still can't believe it.",
         "He covered a surprise Oasis song mid-set and the crowd absolutely lost it. Setlist had something for everyone.",
         "Sitting in the standing area was a bit cramped but the show itself was flawless. Ed is just effortlessly brilliant live.",
     ],
     "beyonce": [
-        "Renaissance Tour in NYC was a spiritual experience. The choreography, the costumes, the vocals — absolutely superhuman.",
+        "Renaissance Tour in NYC was a spiritual experience. The choreography, the costumes, the vocals - absolutely superhuman.",
         "She performed for nearly two and a half hours with zero breaks. I don't know how she does it.",
-        "Arrived sceptical about the Renaissance album live — left believing it might be her best work. The staging told a story.",
+        "Arrived sceptical about the Renaissance album live - left believing it might be her best work. The staging told a story.",
     ],
     "drake": [
         "OVO Fest energy carried straight into this show. Toronto crowds are something else when Drake is on home turf.",
         "The light rig was jaw-dropping. God's Plan as the encore had the whole Scotiabank Arena in tears.",
-        "Great mix of old and new — he played a ton of Take Care deep cuts which I did not expect and loved.",
+        "Great mix of old and new - he played a ton of Take Care deep cuts which I did not expect and loved.",
     ],
     "adele": [
         "I've seen a lot of concerts but Adele's voice live is genuinely in another category. Spent most of Someone Like You crying.",
@@ -264,26 +264,26 @@ REVIEWS: dict[str, list[str]] = {
     "kendrick-lamar": [
         "The Grand National Tour is unlike any hip-hop show I've seen. More like performance art than a concert.",
         "Kendrick walked out to a completely silent SoFi Stadium and held the crowd in his hand for two hours. Masterful.",
-        "Not Like Us live is already legendary. The crowd response was seismic — you could feel the bass in your chest.",
+        "Not Like Us live is already legendary. The crowd response was seismic - you could feel the bass in your chest.",
     ],
     "rihanna": [
         "She's still got it completely. Rude Boy and We Found Love back-to-back had everyone losing their minds.",
         "Coca-Cola Arena might be smaller than her usual venues but the energy was actually more intense for it.",
-        "Production was massive — the stage extended right into the crowd. Felt like being inside the show rather than watching it.",
+        "Production was massive - the stage extended right into the crowd. Felt like being inside the show rather than watching it.",
     ],
     "post-malone": [
-        "Rockstar into Sunflower into Circles — he opened with three hits and never slowed down. Incredible setlist.",
+        "Rockstar into Sunflower into Circles - he opened with three hits and never slowed down. Incredible setlist.",
         "Post is so much more charismatic live than I expected. Genuinely funny between songs and clearly having the time of his life.",
         "United Center sounded fantastic. The guitar sections in his newer material hit way harder in person.",
     ],
     "sabrina-carpenter": [
         "Short n' Sweet tour is genuinely the most fun I've had at a concert this year. She's a natural born performer.",
         "Every outfit change was iconic. The crowd at Avicii Arena skewed young but honestly everyone was dancing.",
-        "Espresso live is absurdly catchy. She performed it twice — once at the start and once as the encore — and it was the right call both times.",
+        "Espresso live is absurdly catchy. She performed it twice - once at the start and once as the encore - and it was the right call both times.",
     ],
     "imagine-dragons": [
         "Thunderstruck opener with Dan Reynolds on a platform above the crowd. Allegiant Stadium was shaking.",
-        "They played a career-spanning set — Radioactive to Bones — and every song got the same massive crowd reaction.",
+        "They played a career-spanning set - Radioactive to Bones - and every song got the same massive crowd reaction.",
         "Great sound mix and a genuinely tight band. Mercury is underrated as a live album and they proved it tonight.",
     ],
     "linkin-park": [
