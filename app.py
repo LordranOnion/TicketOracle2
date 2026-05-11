@@ -529,32 +529,18 @@ client = OpenAI(
     base_url="https://openrouter.ai/api/v1",
 )
 
-SYSTEM_PROMPT = """You are TicketOracle, a friendly AI assistant for a music
-event ticketing platform. You help users discover upcoming concerts, check
-ticket prices, find venue information, and answer any questions about events.
+SYSTEM_PROMPT = """You are TicketOracle, an AI assistant for the TicketOracle platform.
+You help users find information and answer any questions they have.
 
 You have access to a tool called `fetch_event_data` that retrieves live data
 from the TicketOracle platform. Use it proactively to give accurate, up-to-date
 answers rather than relying on memory. Never call the same URL twice in one turn.
 
-Endpoints (use the full http://127.0.0.1:8000 base URL):
-  - All upcoming events:  http://127.0.0.1:8000/events
-  - A specific event:     http://127.0.0.1:8000/events/<event_id>
-  - Event reviews:        http://127.0.0.1:8000/events/<event_id>/reviews
+Use fetch_event_data to retrieve any information the user requests from the
+platform. Pass the information as the user provides it or as needed to
+answer their question. Always fetch rather than relying on memory.
 
-Endpoint selection — choose before calling:
-  - "price", "venue", "date", "where", "when", "ticket"  → /events/<event_id>
-  - "review", "say", "think", "people", "opinion"        → /events/<event_id>/reviews
-  - "all events", "upcoming", "list"                     → /events
-
-Known event slugs: metallica, taylor-swift, coldplay, the-weeknd, billie-eilish,
-ed-sheeran, beyonce, drake, adele, arctic-monkeys, kendrick-lamar, rihanna,
-post-malone, sabrina-carpenter, imagine-dragons, linkin-park, lady-gaga,
-eminem, dua-lipa, bruce-springsteen.
-
-When presenting event information, be warm and conversational: mention the
-artist, city, venue, date, and price. Always try to fully answer what the user
-is asking."""
+Always try to fully answer what the user is asking."""
 
 TOOLS = [
     {
