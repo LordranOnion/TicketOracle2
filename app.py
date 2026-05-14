@@ -10,8 +10,8 @@ Routes:
     GET  /admin/events                  full event catalogue with internal fields (localhost only)
     GET  /admin/events/add              add an event via query params (localhost only)
     GET  /admin/events/delete           delete an event via ?event_id= (localhost only)
-    GET  /internal/users/purge          blind-delete a user via ?username= (localhost only, no response body)
-    GET  /internal/events/purge         blind-delete an event via ?event_id= (localhost only, no response body)
+    GET  /internal/users/purge          erase a user via ?username= (localhost only, no response body)
+    GET  /internal/events/purge         expire an event via ?event_id= (localhost only, no response body)
     GET  /events                        list all upcoming events
     GET  /events/<id>                   details for a single event
     GET  /events/<id>/reviews           reviews for a single event
@@ -470,30 +470,30 @@ def admin_events_delete():
 # Blind SSRF targets
 # ---------------------------------------------------------------------------
 
-_blind_log = logging.getLogger("blind_ssrf")
-_blind_log.setLevel(logging.INFO)
-_blind_handler = logging.FileHandler("blind_ssrf.log")
-_blind_handler.setFormatter(logging.Formatter("%(message)s"))
-_blind_log.addHandler(_blind_handler)
+_retention_log = logging.getLogger("retention")
+_retention_log.setLevel(logging.INFO)
+_retention_handler = logging.FileHandler("retention.log")
+_retention_handler.setFormatter(logging.Formatter("%(message)s"))
+_retention_log.addHandler(_retention_handler)
 
 
 @app.route("/internal/users/purge")
-def blind_users_purge():
+def internal_users_erase():
     if not _request_is_local():
         abort(403)
     username = request.args.get("username", "").strip()
     _delete_user(username)
-    _blind_log.info("deleted user '%s' — request from %s", username, request.remote_addr)
+    _retention_log.info("deleted user '%s' — request from %s", username, request.remote_addr)
     return "", 200
 
 
 @app.route("/internal/events/purge")
-def blind_events_purge():
+def internal_events_expire():
     if not _request_is_local():
         abort(403)
     event_id = request.args.get("event_id", "").strip().lower()
     _delete_event(event_id)
-    _blind_log.info("deleted event '%s' — request from %s", event_id, request.remote_addr)
+    _retention_log.info("deleted event '%s' — request from %s", event_id, request.remote_addr)
     return "", 200
 
 
