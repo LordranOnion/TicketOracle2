@@ -1,7 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(Remove-Item \"c:\\\\Users\\\\tsigo\\\\Desktop\\\\TicketOracle2\\\\internal_service.py\")"
-    ]
-  }
-}
